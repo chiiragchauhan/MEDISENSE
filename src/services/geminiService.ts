@@ -2,7 +2,64 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+/**
+ * Rule-based fallback engine for when API keys are unavailable.
+ * Generates clinical logistics explanations using deterministic logic.
+ */
+function generateRuleBasedExplanation(data: any) {
+  const { 
+    trafficRisk, 
+    weatherRisk, 
+    delayRiskScore, 
+    medicalPriorityScore, 
+    recommendedRoute, 
+    timeSaved, 
+    accuracy 
+  } = data;
+
+  let riskAnalysis = "";
+  
+  if (delayRiskScore > 0.7) {
+    riskAnalysis = "Critical infrastructure congestion detected. Primary transport corridors are experiencing significant throughput degradation.";
+  } else if (delayRiskScore > 0.4) {
+    riskAnalysis = "Moderate operational friction identified. Environmental and traffic vectors are converging to create potential delay windows.";
+  } else {
+    riskAnalysis = "Operational environment is stable. Low risk of delay for critical medical units.";
+  }
+
+  let priorityAnalysis = "";
+  if (medicalPriorityScore > 0.8) {
+    priorityAnalysis = " Transport urgency is categorized as 'Life-Critical'. Route selection prioritizes immediate clinical intervention over standard logistics efficiency.";
+  } else {
+    priorityAnalysis = " Transport is categorized as 'Time-Sensitive'. Route selection balances clinical priority with optimal asset utilization.";
+  }
+
+  const weatherImpact = weatherRisk > 0.5 ? " Severe weather conditions are impacting braking distance and visibility, necessitating the use of specialized emergency corridors." : "";
+
+  return `
+### Recommended Route
+**${recommendedRoute.name}**
+
+### Estimated Time Saved
+**${timeSaved} minutes**
+
+### Operational Risk Explanation
+${riskAnalysis}${priorityAnalysis}${weatherImpact} The selection of **${recommendedRoute.name}** is mathematically optimized to minimize the risk-to-time ratio, ensuring medical integrity is maintained during the transit window.
+
+### Model Confidence Score
+**${accuracy}**
+  `.trim();
+}
+
 export async function explainLogisticsRisk(data: any) {
+  // Check if API key is valid (not empty or placeholder)
+  const hasApiKey = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "YOUR_API_KEY";
+
+  if (!hasApiKey) {
+    console.log("MediSense: Using Rule-Based Logic Engine (No API Key detected)");
+    return generateRuleBasedExplanation(data);
+  }
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -52,6 +109,6 @@ export async function explainLogisticsRisk(data: any) {
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "### Recommended Route\n**Medical Emergency Corridor (Alpha)**\n\n### Estimated Time Saved\n**16 minutes**\n\n### Operational Risk Explanation\nDefaulting to priority corridor due to system error. Clinical priority remains high.";
+    return generateRuleBasedExplanation(data);
   }
 }
