@@ -225,7 +225,12 @@ export default function App() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Performance Chart */}
-              <div className="lg:col-span-2 glass-card p-6">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="lg:col-span-2 glass-card p-6"
+              >
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h3 className="text-lg font-bold text-slate-800">Transport Latency</h3>
@@ -283,7 +288,9 @@ export default function App() {
                   </div>
 
                   <div className="pt-4 border-t border-slate-100">
-                    <button 
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={handleAnalyze}
                       disabled={isAnalyzing}
                       className={cn(
@@ -304,7 +311,7 @@ export default function App() {
                           Generate Optimization Report
                         </>
                       )}
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
               </div>
@@ -319,7 +326,9 @@ export default function App() {
                 <h3 className="text-xl font-bold text-slate-800">Active Medical Fleet</h3>
                 <p className="text-sm text-slate-500">{data?.activeFleets || 0} units currently operational</p>
               </div>
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleDispatch}
                 disabled={isDispatching}
                 className={cn(
@@ -338,16 +347,17 @@ export default function App() {
                     Dispatch New Unit
                   </>
                 )}
-              </button>
+              </motion.button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {fleet.map((unit, i) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  whileHover={{ y: -5, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
                   key={unit.id} 
-                  className="glass-card p-5 space-y-4 hover:shadow-md transition-shadow group"
+                  className="glass-card p-5 space-y-4 group transition-all duration-300"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
@@ -476,7 +486,10 @@ export default function App() {
             </div>
 
             <div className="space-y-8">
-              <div 
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-card bg-slate-900 overflow-hidden relative min-h-[500px] border-none shadow-2xl cursor-crosshair"
                 onMouseMove={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
@@ -747,11 +760,15 @@ export default function App() {
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", 
-                        precipLevel > 50 ? "bg-rose-500/20 text-rose-500" : "bg-sky-500/20 text-sky-500"
-                      )}>
+                      <motion.div 
+                        animate={precipLevel > 50 ? { y: [0, -4, 0] } : {}}
+                        transition={precipLevel > 50 ? { repeat: Infinity, duration: 2, ease: "easeInOut" } : {}}
+                        className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", 
+                          precipLevel > 50 ? "bg-rose-500/20 text-rose-500" : "bg-sky-500/20 text-sky-500"
+                        )}
+                      >
                         <CloudRain size={24} />
-                      </div>
+                      </motion.div>
                       <div className="flex-1">
                         <p className="text-lg font-bold">Precipitation Warning</p>
                         <p className="text-xs text-slate-400">
@@ -918,13 +935,15 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredItems.length > 0 ? (
-                filteredItems.map((item) => (
+                filteredItems.map((item, i) => (
                   <motion.div 
                     layout
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.05 }}
+                    whileHover={{ y: -8, shadow: "0 25px 50px -12px rgb(0 0 0 / 0.25)" }}
                     key={item.id} 
-                    className="glass-card overflow-hidden group"
+                    className="glass-card overflow-hidden group transition-all duration-300"
                   >
                     <div className="h-48 overflow-hidden relative">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
@@ -939,12 +958,14 @@ export default function App() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-rose-600">{item.price}</span>
-                        <button 
+                        <motion.button 
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => alert(`Order placed for: ${item.name}. Dispatching unit for pickup.`)}
                           className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-colors"
                         >
                           Purchase Now
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   </motion.div>
@@ -1007,14 +1028,16 @@ export default function App() {
                 <h3 className="text-2xl font-bold text-slate-800">Clinical Consultations</h3>
                 <p className="text-sm text-slate-500">Connect with medical experts for logistics-related clinical guidance</p>
               </div>
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleBook('Dr. Sarah Chen')}
                 disabled={isBooking}
                 className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-rose-100 hover:bg-rose-700 transition-all disabled:opacity-50"
               >
                 <Calendar size={18} />
                 {isBooking ? 'Processing...' : 'New Appointment'}
-              </button>
+              </motion.button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1025,8 +1048,15 @@ export default function App() {
                   Available Specialists
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {doctors.map((dr) => (
-                    <div key={dr.id} className="glass-card p-5 flex items-center gap-4 hover:border-rose-200 transition-colors group">
+                  {doctors.map((dr, i) => (
+                    <motion.div 
+                      key={dr.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      whileHover={{ scale: 1.02 }}
+                      className="glass-card p-5 flex items-center gap-4 hover:border-rose-200 transition-colors group cursor-pointer"
+                    >
                       <img src={dr.image} alt={dr.name} className="w-16 h-16 rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
                       <div className="flex-1">
                         <h5 className="font-bold text-slate-800">{dr.name}</h5>
@@ -1036,14 +1066,16 @@ export default function App() {
                           Available {dr.availability}
                         </div>
                       </div>
-                      <button 
+                      <motion.button 
+                        whileHover={{ scale: 1.1, backgroundColor: "#f43f5e", color: "#fff" }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => handleBook(dr.name)}
                         disabled={isBooking}
-                        className="p-2 bg-slate-50 text-slate-400 rounded-lg hover:bg-rose-600 hover:text-white transition-all disabled:opacity-30"
+                        className="p-2 bg-slate-50 text-slate-400 rounded-lg transition-all disabled:opacity-30"
                       >
                         <ChevronRight size={18} />
-                      </button>
-                    </div>
+                      </motion.button>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -1091,14 +1123,16 @@ export default function App() {
                   <h4 className="text-2xl font-bold">Need Emergency Guidance?</h4>
                   <p className="text-slate-400 max-w-md">Connect with our on-call clinical logistics lead for immediate decision support in critical transport scenarios.</p>
                 </div>
-                <button 
+                <motion.button 
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleInstantConsult}
                   disabled={isBooking}
                   className="px-8 py-4 bg-rose-600 text-white rounded-2xl font-bold hover:bg-rose-700 transition-all shadow-xl shadow-rose-900/20 flex items-center gap-2 disabled:opacity-50"
                 >
                   <Zap size={20} />
                   {isBooking ? 'Connecting...' : 'Start Instant Consult'}
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
@@ -1234,26 +1268,41 @@ export default function App() {
 
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick: () => void }) {
   return (
-    <button 
+    <motion.button 
+      whileHover={{ x: 4 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group",
+        "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative",
         active 
           ? "bg-rose-50 text-rose-700 shadow-sm" 
           : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
       )}
     >
+      {active && (
+        <motion.div 
+          layoutId="activeNav"
+          className="absolute left-0 w-1 h-6 bg-rose-600 rounded-r-full"
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        />
+      )}
       <span className={cn(active ? "text-rose-600" : "text-slate-400 group-hover:text-slate-600")}>
         {icon}
       </span>
       {label}
-    </button>
+    </motion.button>
   );
 }
 
 function StatCard({ title, value, subValue, trend, trendType, icon }: any) {
   return (
-    <div className="glass-card p-6 hover:shadow-md transition-shadow">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      whileHover={{ y: -4, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+      className="glass-card p-6 transition-all duration-300"
+    >
       <div className="flex items-center justify-between mb-4">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{title}</span>
         <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center">
@@ -1273,7 +1322,7 @@ function StatCard({ title, value, subValue, trend, trendType, icon }: any) {
           {trend}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
