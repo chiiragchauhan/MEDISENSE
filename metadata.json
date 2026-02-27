@@ -1,0 +1,7 @@
+{
+  "name": "MediSense: Healthcare Logistics Intelligence",
+  "description": "Real-time healthcare logistics engine for emergency transport, organ delivery, and critical medicine distribution.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
